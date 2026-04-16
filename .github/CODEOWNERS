@@ -1,0 +1,32 @@
+# StatsClaw-Codex Code Owners
+# These owners are automatically requested for review on PRs that touch their areas.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default — all files require maintainer review
+* @statsclaw/maintainers
+
+# AGENTS.md is the orchestration policy entry point — the most critical file
+/AGENTS.md @xuyiqing
+
+# Agent definitions — core framework behavior
+/agents/ @statsclaw/maintainers
+
+# Skills — shared protocol definitions
+/skills/ @statsclaw/maintainers
+
+# Profiles — language-specific rules (community contributions welcome, but reviewed)
+/profiles/ @statsclaw/maintainers
+
+# Dispatch & wrapper scripts — core Codex runtime primitives
+/scripts/ @statsclaw/maintainers
+
+# Slash command prompts
+/prompts/ @statsclaw/maintainers
+
+# Installer / uninstaller
+/install.sh @statsclaw/maintainers
+/uninstall.sh @statsclaw/maintainers
+/codex-config.example.toml @statsclaw/maintainers
+
+# CI/CD and repo infrastructure
+/.github/ @statsclaw/maintainers
