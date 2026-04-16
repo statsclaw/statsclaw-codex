@@ -54,13 +54,13 @@ else
   git clone --quiet --depth=1 --branch "$BRANCH" "$REPO" "$DIR"
 fi
 
-INSTALL_ARGS=()
-if [[ "${STATSCLAW_NO_SHELL_HOOK:-0}" == "1" ]]; then
-  INSTALL_ARGS+=(--no-shell-hook)
-fi
-
 say "running install.sh"
-bash "$DIR/install.sh" "${INSTALL_ARGS[@]}"
+# Safe under bash 3.2 + set -u — no arrays, pass args as plain positional params.
+if [[ "${STATSCLAW_NO_SHELL_HOOK:-0}" == "1" ]]; then
+  bash "$DIR/install.sh" --no-shell-hook
+else
+  bash "$DIR/install.sh"
+fi
 
 echo
 say "StatsClaw-Codex is ready."
