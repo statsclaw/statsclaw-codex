@@ -1,0 +1,82 @@
+# Example Codex CLI configuration for StatsClaw-Codex.
+#
+# This file is NOT copied verbatim. `install.sh` appends the
+# `[profiles.statsclaw-*]` blocks below (everything after the banner) into
+# the user's existing `~/.codex/config.toml`, preserving their other settings.
+#
+# If you prefer to configure manually, copy the sections you want into
+# `~/.codex/config.toml`.
+#
+# ============================================================================
+# ==== StatsClaw-Codex profiles  (merged by install.sh — everything below) ===
+# ============================================================================
+
+# Leader — orchestrates the workflow, dispatches specialist teammates.
+# Should have full tool access (git, network, shell) but NOT Write/Edit on the
+# target repo (enforced at the protocol level by AGENTS.md + leader.md).
+[profiles.statsclaw-leader]
+model = "gpt-5"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+disable_response_storage = false
+
+# Planner — reads specs, papers, uploads; produces spec/test-spec/sim-spec.
+# Needs web/PDF read access but must not write to target repo.
+[profiles.statsclaw-planner]
+model = "gpt-5"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+# Builder — implements code from spec.md. Runs inside a git worktree.
+# Needs full workspace-write; tool access restricted by agents/builder.md.
+[profiles.statsclaw-builder]
+model = "gpt-5"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+# Tester — independent validation. Runs language validation commands
+# (R CMD check, pytest, npm test, ...). Must NOT write to source code.
+[profiles.statsclaw-tester]
+model = "gpt-5"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+# Scriber — writes documentation + ARCHITECTURE.md + log-entry.md. Worktree.
+[profiles.statsclaw-scriber]
+model = "gpt-5"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+# Simulator — writes DGP and Monte Carlo harness from sim-spec.md. Worktree.
+# May need significantly more compute; consider a larger model if available.
+[profiles.statsclaw-simulator]
+model = "gpt-5"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+# Reviewer — read-only convergence check across pipelines.
+[profiles.statsclaw-reviewer]
+model = "gpt-5"
+approval_policy = "never"
+sandbox_mode = "read-only"
+
+# Distiller — extracts reusable knowledge, applies privacy scrub.
+# Reads run artifacts + local brain repo; writes brain-contributions.md only.
+[profiles.statsclaw-distiller]
+model = "gpt-5"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+# Shipper — git operations + GitHub API. Needs network + push credentials.
+[profiles.statsclaw-shipper]
+model = "gpt-5"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+# --- MCP servers (optional) --------------------------------------------------
+# StatsClaw-Codex works fine without MCP; these are convenience integrations.
+#
+# [mcp_servers.github]
+# command = "npx"
+# args = ["-y", "@modelcontextprotocol/server-github"]
+# env = { GITHUB_TOKEN = "$GITHUB_TOKEN" }

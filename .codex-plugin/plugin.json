@@ -1,0 +1,35 @@
+{
+  "name": "statsclaw-codex",
+  "version": "1.0.0",
+  "description": "OpenAI Codex CLI port of StatsClaw — a multi-agent workflow framework for building, testing, and shipping statistical software packages",
+  "author": {
+    "name": "StatsClaw"
+  },
+  "repository": "https://github.com/statsclaw/statsclaw-codex",
+  "upstream": "https://github.com/statsclaw/statsclaw",
+  "license": "MIT",
+  "keywords": ["statistics", "agents", "workflow", "codex", "R", "Python", "brain"],
+  "entry": "AGENTS.md",
+  "runtime": "codex-cli",
+  "minimum_codex_version": "0.5.0",
+  "agents": [
+    "agents/leader.md",
+    "agents/planner.md",
+    "agents/builder.md",
+    "agents/tester.md",
+    "agents/scriber.md",
+    "agents/simulator.md",
+    "agents/distiller.md",
+    "agents/reviewer.md",
+    "agents/shipper.md"
+  ],
+  "prompts": [
+    "prompts/contribute.md",
+    "prompts/loop.md",
+    "prompts/ship-it.md",
+    "prompts/review.md",
+    "prompts/patrol.md",
+    "prompts/simulate.md",
+    "prompts/brain.md"
+  ]
+}
