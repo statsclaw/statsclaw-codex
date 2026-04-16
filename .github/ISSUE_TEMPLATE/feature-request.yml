@@ -1,0 +1,67 @@
+name: "Feature Request"
+description: "Suggest a new feature or improvement for StatsClaw-Codex"
+title: "[Feature]: "
+labels: ["enhancement", "community"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Your ideas help shape the [Roadmap](../../ROADMAP.md).
+
+        If this feature would also benefit the upstream Claude Code version (`statsclaw/statsclaw`), please say so — we coordinate roadmaps across both distributions.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What would you like StatsClaw-Codex to do?
+      description: Describe the feature or improvement you'd like to see.
+      placeholder: "e.g., Support a `codex exec --batch` execution mode for running issue patrol across many repos overnight"
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: How would you use this feature? What problem does it solve?
+      placeholder: "e.g., I maintain several R packages and want to patrol their issue trackers in one overnight run"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of StatsClaw-Codex does this relate to?
+      options:
+        - Agent behavior (leader, planner, builder, tester, etc.)
+        - Language profile (R, Python, Stata, etc.)
+        - Codex-specific (dispatch.sh, prompts/, codex-config.example.toml, install.sh)
+        - Paper-to-Package pipeline
+        - Simulation workflows
+        - Documentation & tutorials
+        - Brain system & knowledge sharing
+        - CI/CD & packaging
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: cross-cutting
+    attributes:
+      label: Should this also land in upstream (`statsclaw/statsclaw`)?
+      options:
+        - "Yes — protocol/agent/skill change that applies to both distributions"
+        - "No — Codex-specific (dispatch, prompts, installer, Codex profiles)"
+        - "Not sure"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Any other details, screenshots, or references.
+      placeholder: "Links to related papers, examples, etc."
+    validations:
+      required: false

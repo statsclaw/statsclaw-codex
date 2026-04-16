@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+
+jobs:
+  # ─────────────────────────────────────────────────────────
+  # 1. Framework structure & cross-reference integrity
+  # ─────────────────────────────────────────────────────────
+  validate-structure:
+    name: Validate structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run structure validation
+        run: bash .github/scripts/validate-structure.sh
+
+  # ─────────────────────────────────────────────────────────
+  # 2. Markdown lint
+  # ─────────────────────────────────────────────────────────
+  lint-markdown:
+    name: Lint Markdown
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint Markdown files
+        uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          config: .markdownlint.yml
+          globs: |
+            **/*.md
+            !.repos/**
+
+  # ─────────────────────────────────────────────────────────
+  # 3. YAML validation
+  # ─────────────────────────────────────────────────────────
+  validate-yaml:
+    name: Validate YAML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate YAML files
+        run: |
+          pip install yamllint --quiet
+          yamllint -d relaxed .github/ISSUE_TEMPLATE/*.yml .github/DISCUSSION_CATEGORY_FORMS/*.yml .github/workflows/*.yml
+
+  # ─────────────────────────────────────────────────────────
+  # 4. Shell scripts sanity (dispatch.sh, worktree.sh, etc.)
+  # ─────────────────────────────────────────────────────────
+  shell-lint:
+    name: Shell lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: Run shellcheck on scripts/
+        run: |
+          shopt -s nullglob
+          files=(scripts/*.sh install.sh uninstall.sh .github/scripts/*.sh)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No shell scripts found to lint"
+            exit 0
+          fi
+          shellcheck -S warning "${files[@]}"
+
+  # ─────────────────────────────────────────────────────────
+  # 5. TOML sanity — codex-config.example.toml parses cleanly
+  # ─────────────────────────────────────────────────────────
+  validate-toml:
+    name: Validate TOML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tomllib checker (Python 3.11+ has tomllib built-in)
+        run: python3 -c "import sys; print(sys.version_info)"
+      - name: Parse codex-config.example.toml
+        run: |
+          python3 - <<'PY'
+          import tomllib, sys
+          with open('codex-config.example.toml', 'rb') as f:
+              try:
+                  tomllib.load(f)
+              except tomllib.TOMLDecodeError as e:
+                  print(f'::error::TOML parse error: {e}')
+                  sys.exit(1)
+          print('codex-config.example.toml parses cleanly')
+          PY

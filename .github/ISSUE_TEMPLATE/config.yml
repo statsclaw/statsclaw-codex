@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Discussions - Ideas & Brainstorm
+    url: https://github.com/statsclaw/statsclaw-codex/discussions/categories/ideas
+    about: "Share and discuss ideas for StatsClaw-Codex's future"
+  - name: Discussions - Q&A
+    url: https://github.com/statsclaw/statsclaw-codex/discussions/categories/q-a
+    about: "Ask questions about using StatsClaw-Codex"
+  - name: Upstream (Claude Code) repository
+    url: https://github.com/statsclaw/statsclaw
+    about: "Report issues that also apply to the upstream Claude Code version"
+  - name: StatsClaw Website
+    url: https://statsclaw.ai
+    about: "Visit the StatsClaw website"

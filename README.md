@@ -56,22 +56,43 @@ Everything else — gates, preconditions, state transitions, must-not rules, the
 - **Git** with either `gh`, a SSH key, `$GITHUB_TOKEN`, or a credential helper
 - **Your target language toolchain** (R, Python, Julia, Stata, TypeScript, Go, Rust, C, C++)
 
-### Global install (recommended)
+### One-liner (recommended)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/statsclaw/statsclaw-codex/main/install-remote.sh | bash
+```
+
+That's it. Open a **new** terminal and run `codex`. No manual `source`, no env-var juggling.
+
+What it does, end to end:
+
+1. Clones `statsclaw/statsclaw-codex` into `~/.codex/plugins/statsclaw` (or pulls if already there).
+2. Runs `install.sh` which:
+   - Writes `STATSCLAW_CODEX_ROOT` / `STATSCLAW_CODEX_DATA` / `PATH` into `~/.codex/env.sh`.
+   - Imports the protocol into `~/.codex/AGENTS.md` (so every Codex session inherits it).
+   - Symlinks `prompts/*.md` into `~/.codex/prompts/` — `/contribute`, `/loop`, `/ship-it`, `/review`, `/patrol`, `/simulate`, `/brain` are now slash commands.
+   - Merges `[profiles.statsclaw-*]` blocks into `~/.codex/config.toml`, preserving your existing settings.
+   - Hooks `source ~/.codex/env.sh` into `~/.bashrc` and/or `~/.zshrc`, so new terminals auto-load the env.
+   - Creates the runtime data dir `~/.codex/data/statsclaw/`.
+
+The installer and its hook are **idempotent** — re-running never duplicates lines.
+
+If you'd rather not pipe curl to bash (valid preference), do it in two steps:
 
 ```bash
 git clone https://github.com/statsclaw/statsclaw-codex ~/.codex/plugins/statsclaw
 bash ~/.codex/plugins/statsclaw/install.sh
 ```
 
-`install.sh` is idempotent. It:
+To skip the shell-rc hook and manage `source ~/.codex/env.sh` yourself:
 
-- Appends `@<root>/AGENTS.md` into `~/.codex/AGENTS.md` so every Codex session inherits the protocol.
-- Symlinks `prompts/*.md` into `~/.codex/prompts/` so `/contribute`, `/loop`, `/ship-it`, `/review`, `/patrol`, `/simulate`, `/brain` are available as slash commands.
-- Merges `[profiles.statsclaw-*]` blocks into `~/.codex/config.toml` (existing user settings preserved).
-- Exports `STATSCLAW_CODEX_ROOT` and `STATSCLAW_CODEX_DATA` in `~/.codex/env.sh`.
-- Prepends `scripts/` to `$PATH` so `dispatch.sh`, `worktree.sh`, `detect-credentials.sh`, and `loop.sh` are on your path.
+```bash
+bash ~/.codex/plugins/statsclaw/install.sh --no-shell-hook
+# or for the remote installer:
+STATSCLAW_NO_SHELL_HOOK=1 curl -fsSL .../install-remote.sh | bash
+```
 
-After installation, open a new shell (or `source ~/.codex/env.sh`) and you're set:
+### Try it
 
 ```bash
 codex                    # start a session — AGENTS.md is auto-loaded
