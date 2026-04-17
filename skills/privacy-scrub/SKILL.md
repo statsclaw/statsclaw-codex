@@ -1,8 +1,6 @@
 ---
 name: privacy-scrub
-description: "PII removal for brain knowledge contributions"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] PII-removal protocol applied to every candidate brain entry before it leaves the user's machine. Four categories: identifiers, paths/references, code references (genericized), data references."
 ---
 # Skill: Privacy Scrub — PII Removal for Brain Contributions
 

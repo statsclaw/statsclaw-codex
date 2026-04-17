@@ -1,8 +1,6 @@
 ---
 name: attribution
-description: "Commit co-author trailer management"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] Rules for the Co-authored-by trailer that shipper must include on every commit so StatsClaw and the user both show up on the GitHub commit page."
 ---
 # Shared Skill: Attribution — Commit Co-Author Trailers
 

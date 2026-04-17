@@ -1,8 +1,6 @@
 ---
 name: workspace-sync
-description: "Centralized workflow log repository sync"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] Centralized workflow-log repository sync. Governs acquisition of the workspace repo, runtime state layout, and the post-run push of logs and CHANGELOG/HANDOFF entries."
 ---
 # Shared Skill: Workspace Sync — Centralized Workflow Log Repository
 

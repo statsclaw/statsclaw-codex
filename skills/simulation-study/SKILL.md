@@ -1,8 +1,6 @@
 ---
 name: simulation-study
-description: "Monte Carlo simulation study protocol"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] Full Monte Carlo simulation protocol: DGP specification, harness design, convergence diagnostics, tolerance integrity, and coverage/size/power reporting. The user-facing entry is the `simulate` skill; this file contains the mechanics."
 ---
 # Skill: Simulation Study — Monte Carlo Evaluation of Estimator Properties
 

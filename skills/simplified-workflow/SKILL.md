@@ -1,8 +1,6 @@
 ---
 name: simplified-workflow
-description: "Lightweight workflow for small routine changes"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] Workflow 10 mechanics. Defines the smallness criteria, the reduced dispatch chain, and the hard gates that remain (credentials, reviewer) even when the full two-pipeline architecture is collapsed."
 ---
 # Skill: Simplified Workflow (Workflow 10)
 

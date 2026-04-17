@@ -1,8 +1,6 @@
 ---
 name: handoff
-description: "Artifact handoff protocol for two-pipeline architecture"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] Artifact handoff protocol for the two-pipeline architecture. Defines which files are produced by whom, what each downstream teammate may read, and how the workspace repo receives the run log."
 ---
 # Shared Skill: Handoff Protocol (Two-Pipeline Architecture)
 

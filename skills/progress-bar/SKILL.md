@@ -1,8 +1,6 @@
 ---
 name: progress-bar
-description: "Visual workflow progress indicator for users"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] Rendering of the visual progress bar that leader prints after every status.md update. Not triggered by user intent; purely a formatting protocol."
 ---
 # Skill: Progress Bar
 

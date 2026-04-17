@@ -1,35 +1,40 @@
 {
-  "name": "statsclaw-codex",
+  "name": "statsclaw",
   "version": "1.0.0",
-  "description": "OpenAI Codex CLI port of StatsClaw — a multi-agent workflow framework for building, testing, and shipping statistical software packages",
+  "description": "StatsClaw — a multi-agent workflow framework for building, testing, and shipping statistical software packages (R, Python, Julia, Stata, TypeScript, Go, Rust, C, C++) on OpenAI Codex CLI. Port of statsclaw/statsclaw (Claude Code).",
   "author": {
-    "name": "StatsClaw"
+    "name": "StatsClaw",
+    "url": "https://statsclaw.ai"
   },
+  "homepage": "https://statsclaw.ai",
   "repository": "https://github.com/statsclaw/statsclaw-codex",
-  "upstream": "https://github.com/statsclaw/statsclaw",
   "license": "MIT",
-  "keywords": ["statistics", "agents", "workflow", "codex", "R", "Python", "brain"],
-  "entry": "AGENTS.md",
-  "runtime": "codex-cli",
-  "minimum_codex_version": "0.5.0",
-  "agents": [
-    "agents/leader.md",
-    "agents/planner.md",
-    "agents/builder.md",
-    "agents/tester.md",
-    "agents/scriber.md",
-    "agents/simulator.md",
-    "agents/distiller.md",
-    "agents/reviewer.md",
-    "agents/shipper.md"
+  "keywords": [
+    "statistics",
+    "econometrics",
+    "agent-teams",
+    "workflow",
+    "R",
+    "Python",
+    "Julia",
+    "Stata",
+    "simulation",
+    "monte-carlo",
+    "brain"
   ],
-  "prompts": [
-    "prompts/contribute.md",
-    "prompts/loop.md",
-    "prompts/ship-it.md",
-    "prompts/review.md",
-    "prompts/patrol.md",
-    "prompts/simulate.md",
-    "prompts/brain.md"
-  ]
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "StatsClaw",
+    "shortDescription": "9-agent workflow for building, testing, and shipping statistical packages.",
+    "longDescription": "StatsClaw coordinates nine specialist agents (leader, planner, builder, tester, scriber, simulator, distiller, reviewer, shipper) under three-pipeline adversarial verification — the code, test, and simulation pipelines never see each other's specs. Supports R, Python, Julia, Stata, TypeScript, Go, Rust, C, and C++. Includes issue patrol, Monte Carlo simulation studies, workspace sync, and a shared brain knowledge system.",
+    "developerName": "StatsClaw",
+    "category": "Research",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://statsclaw.ai",
+    "defaultPrompt": [
+      "$patrol open issues on https://github.com/<user>/<repo>",
+      "$simulate finite-sample properties of this estimator",
+      "$ship-it  — commit and push the reviewed changes"
+    ]
+  }
 }

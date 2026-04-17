@@ -10,11 +10,14 @@
 #   1. Clones (or pulls) statsclaw/statsclaw-codex into ~/.codex/plugins/statsclaw
 #   2. Runs install.sh which:
 #        - writes STATSCLAW_CODEX_* env + PATH into ~/.codex/env.sh
-#        - imports AGENTS.md
-#        - symlinks prompts/*.md into ~/.codex/prompts/
+#        - imports AGENTS.md into ~/.codex/AGENTS.md
 #        - merges [profiles.statsclaw-*] into ~/.codex/config.toml
 #        - creates runtime data dir
+#        - registers the plugin in ~/.agents/plugins/marketplace.json
 #        - hooks `source ~/.codex/env.sh` into ~/.bashrc / ~/.zshrc
+#
+# After this, run `codex`, then `/plugins` inside Codex to install the plugin,
+# then trigger any skill with `$patrol`, `$simulate`, `$ship-it`, etc.
 #
 # Environment knobs:
 #   STATSCLAW_CODEX_REPO    Git remote (default: https://github.com/statsclaw/statsclaw-codex.git)
@@ -62,9 +65,20 @@ else
   bash "$DIR/install.sh"
 fi
 
-echo
-say "StatsClaw-Codex is ready."
-say "Open a NEW shell (so the env auto-loads) and run:"
-echo "    codex"
-say "Or in this shell:"
-echo "    source ~/.codex/env.sh && codex"
+cat <<EOF
+
+==> StatsClaw-Codex is ready.
+
+Next steps:
+  1. Open a NEW terminal (so the env + shell-rc hook take effect).
+  2. Run:   codex
+  3. Inside Codex:   /plugins           # browse the marketplace
+                     install statsclaw  # install the plugin
+  4. Trigger any skill:
+       \$patrol <owner/repo>   |   \$simulate <idea>   |   \$ship-it
+       \$review                |   \$contribute       |   \$brain on|off|status
+       \$loop <interval> <cmd>
+
+Natural language also works — Codex matches the skill description.
+E.g. "patrol open issues on xuyiqing/fect" auto-triggers \$patrol.
+EOF

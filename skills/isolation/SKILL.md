@@ -1,8 +1,6 @@
 ---
 name: isolation
-description: "Two-pipeline isolation protocol (worktree and information-level)"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] Two-pipeline isolation protocol. Specifies worktree-level (filesystem) and pipeline-level (information) isolation — which agents get which specs, how dispatch.sh --worktree creates and merges back, and what counts as a violation."
 ---
 # Shared Skill: Two-Pipeline Isolation Protocol
 

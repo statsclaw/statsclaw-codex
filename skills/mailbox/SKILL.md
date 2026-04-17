@@ -1,8 +1,6 @@
 ---
 name: mailbox
-description: "Inter-agent mailbox communication protocol"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] Inter-agent mailbox protocol. Specifies how teammates drop HOLD_REQUEST / BLOCK / STATUS messages into the shared mailbox and how leader drains it on every transition."
 ---
 # Shared Skill: Mailbox Communication Protocol
 

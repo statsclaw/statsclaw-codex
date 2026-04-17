@@ -237,17 +237,69 @@ done
 echo ""
 
 # ─────────────────────────────────────────────────────
-# 14. Codex-specific: slash-command prompts exist
+# 14. Codex-specific: user-facing skills exist
 # ─────────────────────────────────────────────────────
-echo "▶ Checking slash-command prompts..."
-EXPECTED_PROMPTS="contribute loop ship-it review patrol simulate brain"
-for p in $EXPECTED_PROMPTS; do
-  if [ -f "prompts/$p.md" ]; then
-    info "prompts/$p.md"
+echo "▶ Checking user-facing skills ..."
+EXPECTED_USER_SKILLS="patrol simulate ship-it review contribute brain loop"
+for s in $EXPECTED_USER_SKILLS; do
+  if [ -f "skills/$s/SKILL.md" ]; then
+    info "skills/$s/SKILL.md"
   else
-    error "Missing slash-command prompt: prompts/$p.md"
+    error "Missing user-facing skill: skills/$s/SKILL.md"
   fi
 done
+echo ""
+
+# Legacy prompts/ files are kept as reference but are no longer required.
+# Just warn if any are missing.
+for p in contribute loop ship-it review patrol simulate brain; do
+  if [ ! -f "prompts/$p.md" ]; then
+    warn "Legacy reference missing (not fatal): prompts/$p.md"
+  fi
+done
+
+# ─────────────────────────────────────────────────────
+# 16. Codex plugin + marketplace manifests
+# ─────────────────────────────────────────────────────
+echo "▶ Checking Codex plugin + marketplace manifests ..."
+if [ -f ".codex-plugin/plugin.json" ]; then
+  info ".codex-plugin/plugin.json exists"
+  # Validate with Python — must have required fields
+  python3 - <<'PY' || true
+import json, sys, pathlib
+m = json.loads(pathlib.Path(".codex-plugin/plugin.json").read_text())
+required = ["name", "version", "description"]
+missing = [k for k in required if k not in m]
+if missing:
+    print(f"::error::.codex-plugin/plugin.json missing required fields: {missing}")
+    sys.exit(1)
+if "skills" in m and not m["skills"].startswith("./"):
+    print(f"::error::.codex-plugin/plugin.json: 'skills' must start with './' (got {m['skills']!r})")
+    sys.exit(1)
+print(f"  ✓ plugin name={m['name']} version={m['version']}")
+PY
+else
+  error "Missing .codex-plugin/plugin.json"
+fi
+
+if [ -f ".agents/plugins/marketplace.json" ]; then
+  info ".agents/plugins/marketplace.json exists"
+  python3 - <<'PY' || true
+import json, sys, pathlib
+m = json.loads(pathlib.Path(".agents/plugins/marketplace.json").read_text())
+if "plugins" not in m or not isinstance(m["plugins"], list) or not m["plugins"]:
+    print("::error::marketplace.json: missing or empty 'plugins' array")
+    sys.exit(1)
+for p in m["plugins"]:
+    for k in ("name", "source", "policy"):
+        if k not in p:
+            print(f"::error::marketplace.json plugin {p.get('name','?')} missing '{k}'")
+            sys.exit(1)
+print(f"  ✓ marketplace lists {len(m['plugins'])} plugin(s)")
+PY
+else
+  error "Missing .agents/plugins/marketplace.json"
+fi
 echo ""
 
 # ─────────────────────────────────────────────────────
