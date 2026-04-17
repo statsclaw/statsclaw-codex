@@ -101,6 +101,29 @@ echo "[4/6] runtime data dir ready at $DATA"
 # 5. Codex marketplace ---------------------------------------------------
 # Register a user-scoped marketplace.json that points at this checkout as a
 # local plugin source. Codex CLI's `/plugins` browser will pick it up.
+#
+# Codex requires:
+#   - `source.path` MUST start with `./`
+#   - the path is resolved relative to the marketplace ROOT, which for a
+#     `.agents/plugins/marketplace.json` at `~/` is $HOME
+#   - the resolved plugin dir MUST be under that root
+# See codex-rs/core-plugins/src/marketplace.rs :: resolve_local_plugin_source_path
+
+# Compute $ROOT relative to $HOME (e.g. /Users/x/.codex/plugins/statsclaw
+# under home /Users/x → ./.codex/plugins/statsclaw).
+case "$ROOT/" in
+  "$HOME"/*)
+    REL_PATH="./${ROOT#$HOME/}"
+    ;;
+  *)
+    echo "ERROR: plugin checkout at '$ROOT' is NOT under \$HOME ('$HOME')."
+    echo "       Codex's user-scoped marketplace can only point at plugins under \$HOME."
+    echo "       Move this checkout under \$HOME (recommended: ~/.codex/plugins/statsclaw)"
+    echo "       and re-run install.sh, or manage the marketplace manually."
+    exit 1
+    ;;
+esac
+
 write_marketplace() {
   cat > "$AGENTS_MARKETPLACE" <<EOF
 {
@@ -114,7 +137,7 @@ write_marketplace() {
       "name": "statsclaw",
       "source": {
         "source": "local",
-        "path": "$ROOT"
+        "path": "$REL_PATH"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -128,7 +151,7 @@ EOF
 }
 
 if [[ -f "$AGENTS_MARKETPLACE" ]]; then
-  if grep -q '"name": "statsclaw"' "$AGENTS_MARKETPLACE" && grep -q "\"$ROOT\"" "$AGENTS_MARKETPLACE"; then
+  if grep -q '"name": "statsclaw"' "$AGENTS_MARKETPLACE" && grep -q "\"$REL_PATH\"" "$AGENTS_MARKETPLACE"; then
     echo "[5/6] marketplace already registered at $AGENTS_MARKETPLACE"
   else
     cp "$AGENTS_MARKETPLACE" "$AGENTS_MARKETPLACE.bak.$(date +%s)"

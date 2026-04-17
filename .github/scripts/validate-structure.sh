@@ -282,24 +282,10 @@ else
   error "Missing .codex-plugin/plugin.json"
 fi
 
-if [ -f ".agents/plugins/marketplace.json" ]; then
-  info ".agents/plugins/marketplace.json exists"
-  python3 - <<'PY' || true
-import json, sys, pathlib
-m = json.loads(pathlib.Path(".agents/plugins/marketplace.json").read_text())
-if "plugins" not in m or not isinstance(m["plugins"], list) or not m["plugins"]:
-    print("::error::marketplace.json: missing or empty 'plugins' array")
-    sys.exit(1)
-for p in m["plugins"]:
-    for k in ("name", "source", "policy"):
-        if k not in p:
-            print(f"::error::marketplace.json plugin {p.get('name','?')} missing '{k}'")
-            sys.exit(1)
-print(f"  ✓ marketplace lists {len(m['plugins'])} plugin(s)")
-PY
-else
-  error "Missing .agents/plugins/marketplace.json"
-fi
+# No repo-scoped .agents/plugins/marketplace.json — this is a single-plugin
+# repo, so there is no valid relative plugin path from the repo root. The
+# user-scoped marketplace at ~/.agents/plugins/marketplace.json is written by
+# install.sh instead.
 echo ""
 
 # ─────────────────────────────────────────────────────
