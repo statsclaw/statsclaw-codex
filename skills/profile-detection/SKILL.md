@@ -1,8 +1,6 @@
 ---
 name: profile-detection
-description: "Automatic language profile selection for target repositories"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] Automatic language-profile selection for a target repository by inspecting file markers (DESCRIPTION → r-package, pyproject.toml → python-package, etc.)."
 ---
 # Shared Skill: Profile Detection — Automatic Language Profile Selection
 

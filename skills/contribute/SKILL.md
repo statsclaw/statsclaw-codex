@@ -1,7 +1,8 @@
 ---
 name: contribute
-description: "Session knowledge contribution to the shared brain"
-user-invocable: true
+description: Extract reusable knowledge from the current session, privacy-scrub it, and (with explicit user consent) submit it to the shared StatsClaw brain-seedbank as a pull request. Use this skill when the user says "contribute", "share what I learned", "submit lessons", "add to brain", "contribute knowledge", or invokes $contribute. Bypasses the automatic frequency heuristic but applies the same quality gate and mandatory user-consent step — nothing is uploaded without explicit approval.
+metadata:
+  short-description: Contribute session knowledge to the shared brain
 ---
 # Skill: Contribute — Session Knowledge Contribution
 

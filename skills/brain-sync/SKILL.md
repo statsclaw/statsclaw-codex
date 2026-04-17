@@ -1,8 +1,6 @@
 ---
 name: brain-sync
-description: "Knowledge sharing lifecycle management"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] Knowledge-sharing lifecycle: Opt-In → Acquire → Read → Extract → Consent → Upload. Drives when and how the distiller is dispatched, how brain-contributions.md is surfaced to the user, and how approved entries are PR-ed to statsclaw/brain-seedbank."
 ---
 # Skill: Brain Sync — Knowledge Sharing Lifecycle
 

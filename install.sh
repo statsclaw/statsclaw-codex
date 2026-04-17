@@ -2,24 +2,26 @@
 #
 # install.sh — register StatsClaw-Codex with the user's Codex CLI
 #
-# Behaviour:
-#   1. Writes STATSCLAW_CODEX_ROOT + STATSCLAW_CODEX_DATA into ~/.codex/env.sh
-#   2. Adds `@<root>/AGENTS.md` import to ~/.codex/AGENTS.md (if not present)
-#   3. Symlinks prompts/*.md into ~/.codex/prompts/
-#   4. Merges [profiles.statsclaw-*] blocks from codex-config.example.toml
-#      into ~/.codex/config.toml (only if they don't already exist)
-#   5. Creates ${STATSCLAW_CODEX_DATA}/ runtime dir
-#   6. Hooks `source ~/.codex/env.sh` into the user's shell rc (~/.bashrc,
-#      ~/.zshrc) so new shells pick up the env automatically. Pass
-#      `--no-shell-hook` to skip this step.
+# Behaviour (idempotent — safe to re-run):
+#   1. Writes STATSCLAW_CODEX_ROOT + STATSCLAW_CODEX_DATA + PATH into ~/.codex/env.sh
+#   2. Adds `@<root>/AGENTS.md` import to ~/.codex/AGENTS.md
+#   3. Merges [profiles.statsclaw-*] blocks from codex-config.example.toml into ~/.codex/config.toml
+#   4. Creates ${STATSCLAW_CODEX_DATA}/ runtime dir
+#   5. Installs a user-scoped marketplace JSON at ~/.agents/plugins/marketplace.json
+#      so `codex /plugins` can discover and install the statsclaw plugin.
+#   6. Hooks `source ~/.codex/env.sh` into the user's shell rc (~/.bashrc, ~/.zshrc).
 #
-# Idempotent — safe to run multiple times.
+# Flags:
+#   --no-shell-hook   skip step 6
+#
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 DATA="${STATSCLAW_CODEX_DATA:-$CODEX_HOME/data/statsclaw}"
+AGENTS_MARKETPLACE_DIR="$HOME/.agents/plugins"
+AGENTS_MARKETPLACE="$AGENTS_MARKETPLACE_DIR/marketplace.json"
 SHELL_HOOK=1
 
 for arg in "$@"; do
@@ -36,12 +38,14 @@ echo "StatsClaw-Codex installer"
 echo "  framework root: $ROOT"
 echo "  codex home:     $CODEX_HOME"
 echo "  runtime data:   $DATA"
+echo "  marketplace:    $AGENTS_MARKETPLACE"
 echo
 
-mkdir -p "$CODEX_HOME/prompts" "$DATA/workspace" "$DATA/worktrees"
+mkdir -p "$DATA/workspace" "$DATA/worktrees" "$AGENTS_MARKETPLACE_DIR"
 
 # 1. env.sh --------------------------------------------------------------
 ENV_FILE="$CODEX_HOME/env.sh"
+mkdir -p "$CODEX_HOME"
 touch "$ENV_FILE"
 if ! grep -q "STATSCLAW_CODEX_ROOT=" "$ENV_FILE"; then
   {
@@ -53,7 +57,6 @@ if ! grep -q "STATSCLAW_CODEX_ROOT=" "$ENV_FILE"; then
   } >> "$ENV_FILE"
   echo "[1/6] wrote env to $ENV_FILE"
 else
-  # update in place
   sed -i.bak "s|^export STATSCLAW_CODEX_ROOT=.*|export STATSCLAW_CODEX_ROOT=\"$ROOT\"|" "$ENV_FILE"
   sed -i.bak "s|^export STATSCLAW_CODEX_DATA=.*|export STATSCLAW_CODEX_DATA=\"$DATA\"|" "$ENV_FILE"
   rm -f "$ENV_FILE.bak"
@@ -77,22 +80,7 @@ else
   echo "[2/6] StatsClaw-Codex import already present in $GLOBAL_AGENTS"
 fi
 
-# 3. prompts -------------------------------------------------------------
-for p in "$ROOT"/prompts/*.md; do
-  name="$(basename "$p")"
-  target="$CODEX_HOME/prompts/$name"
-  if [[ -L "$target" || -f "$target" ]]; then
-    if [[ "$(readlink -f "$target" 2>/dev/null || echo)" == "$p" ]]; then
-      continue
-    fi
-    echo "  - skipping $name (target already exists and differs — rename it first)"
-    continue
-  fi
-  ln -s "$p" "$target"
-done
-echo "[3/6] symlinked $(ls "$ROOT"/prompts/*.md | wc -l | tr -d ' ') slash commands into $CODEX_HOME/prompts/"
-
-# 4. config.toml profiles ------------------------------------------------
+# 3. config.toml profiles ------------------------------------------------
 CONFIG="$CODEX_HOME/config.toml"
 EXAMPLE="$ROOT/codex-config.example.toml"
 touch "$CONFIG"
@@ -102,15 +90,58 @@ if ! grep -q '\[profiles\.statsclaw-leader\]' "$CONFIG"; then
     echo "# --- StatsClaw-Codex profiles (added by install.sh) ---"
     sed -n '/^# ==== StatsClaw-Codex profiles/,$p' "$EXAMPLE"
   } >> "$CONFIG"
-  echo "[4/6] appended StatsClaw-Codex profiles to $CONFIG"
+  echo "[3/6] appended StatsClaw-Codex profiles to $CONFIG"
 else
-  echo "[4/6] StatsClaw-Codex profiles already present in $CONFIG — leaving untouched"
+  echo "[3/6] StatsClaw-Codex profiles already present in $CONFIG — leaving untouched"
 fi
 
-# 5. runtime dir ---------------------------------------------------------
-echo "[5/6] runtime data dir ready at $DATA"
+# 4. runtime dir ---------------------------------------------------------
+echo "[4/6] runtime data dir ready at $DATA"
 
-# 6. shell rc hook -------------------------------------------------------
+# 5. Codex marketplace ---------------------------------------------------
+# Register a user-scoped marketplace.json that points at this checkout as a
+# local plugin source. Codex CLI's `/plugins` browser will pick it up.
+write_marketplace() {
+  cat > "$AGENTS_MARKETPLACE" <<EOF
+{
+  "name": "statsclaw",
+  "interface": {
+    "displayName": "StatsClaw",
+    "shortDescription": "User-scoped local marketplace for StatsClaw-Codex"
+  },
+  "plugins": [
+    {
+      "name": "statsclaw",
+      "source": {
+        "source": "local",
+        "path": "$ROOT"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Research"
+    }
+  ]
+}
+EOF
+}
+
+if [[ -f "$AGENTS_MARKETPLACE" ]]; then
+  if grep -q '"name": "statsclaw"' "$AGENTS_MARKETPLACE" && grep -q "\"$ROOT\"" "$AGENTS_MARKETPLACE"; then
+    echo "[5/6] marketplace already registered at $AGENTS_MARKETPLACE"
+  else
+    cp "$AGENTS_MARKETPLACE" "$AGENTS_MARKETPLACE.bak.$(date +%s)"
+    write_marketplace
+    echo "[5/6] rewrote marketplace at $AGENTS_MARKETPLACE (previous saved as *.bak.*)"
+    echo "      if you had OTHER plugins registered, merge them back manually from the backup."
+  fi
+else
+  write_marketplace
+  echo "[5/6] registered StatsClaw marketplace at $AGENTS_MARKETPLACE"
+fi
+
+# 6. shell-rc hook -------------------------------------------------------
 HOOK_LINE="[ -f \"$ENV_FILE\" ] && . \"$ENV_FILE\"  # StatsClaw-Codex"
 HOOK_MARK="# StatsClaw-Codex"
 hook_into() {
@@ -128,7 +159,6 @@ hook_into() {
 }
 
 if [[ $SHELL_HOOK -eq 1 ]]; then
-  # Detect shell rc files. Handle bash + zsh; if neither exists, create ~/.profile.
   hooked=0
   if [[ -f "$HOME/.bashrc" ]]; then
     hook_into "$HOME/.bashrc" && hooked=1
@@ -137,14 +167,10 @@ if [[ $SHELL_HOOK -eq 1 ]]; then
     hook_into "$HOME/.zshrc" && hooked=1
   fi
   if [[ $hooked -eq 0 ]]; then
-    # Fallback — create ~/.profile so login shells still pick it up.
     touch "$HOME/.profile"
     hook_into "$HOME/.profile"
   fi
   echo "[6/6] shell-rc hook installed — new shells auto-load the env"
-  # Also source it into the current shell if this script was sourced.
-  # When executed (not sourced), we can't mutate the caller; print the command instead.
-  # shellcheck disable=SC2296
   if (return 0 2>/dev/null); then
     # shellcheck disable=SC1090
     . "$ENV_FILE"
@@ -153,13 +179,23 @@ else
   echo "[6/6] skipping shell-rc hook (--no-shell-hook)"
 fi
 
-echo
-echo "Done."
-if [[ $SHELL_HOOK -eq 1 ]]; then
-  echo "Open a NEW shell (or \`source $ENV_FILE\` in this one) and try:"
-else
-  echo "Run \`source $ENV_FILE\` and try:"
-fi
-echo "  codex               # start a session; AGENTS.md is auto-loaded"
-echo "  /contribute         # invoke a slash command"
-echo "  /patrol fect        # run issue patrol on xuyiqing/fect"
+cat <<EOF
+
+Done. Next steps:
+
+  1. Open a NEW terminal (or run: source $ENV_FILE)
+  2. Run:   codex
+  3. Inside Codex:   /plugins           # browse the marketplace
+                     install statsclaw  # install the plugin
+  4. Then trigger any skill:
+       \$patrol <owner/repo>         # issue patrol
+       \$simulate <description>      # Monte Carlo study
+       \$ship-it                     # push reviewed changes
+       \$review                      # ship/no-ship verdict
+       \$contribute                  # submit session knowledge to the brain
+       \$brain on | off | status     # manage brain mode
+       \$loop <interval> <cmd>       # recurring execution
+
+Natural language also works — Codex matches the skill description.
+E.g. "patrol open issues on xuyiqing/fect" auto-triggers \$patrol.
+EOF

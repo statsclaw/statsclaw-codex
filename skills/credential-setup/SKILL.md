@@ -1,8 +1,6 @@
 ---
 name: credential-setup
-description: "Automatic GitHub credential detection and verification"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] GitHub credential detection and verification. Establishes whether gh CLI, SSH key, $GITHUB_TOKEN, or a credential helper is available before any network-touching work runs."
 ---
 # Shared Skill: Credential Setup — Automatic GitHub Authentication
 

@@ -1,8 +1,6 @@
 ---
 name: issue-patrol
-description: "Automated GitHub issue scanning, triage, and fix loop"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] Full GitHub issue-patrol protocol: scan → triage → per-issue planner→builder→tester→scriber→reviewer→shipper chain → PR + reply → patrol-report.md. The user-facing entry is the `patrol` skill; this file contains the mechanics."
 ---
 # Shared Skill: Issue Patrol — Automated GitHub Issue Monitor
 

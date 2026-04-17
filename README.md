@@ -40,7 +40,7 @@ See the [upstream README](https://github.com/statsclaw/statsclaw#readme) for the
 | `AskUserQuestion` tool | Leader prints a numbered-options markdown question and yields the turn |
 | `Skill` tool | File-reference load of `skills/<name>/SKILL.md` |
 | `~/.claude/settings.json` | `~/.codex/config.toml` `[profiles.statsclaw-*]` |
-| Claude Code slash commands | `~/.codex/prompts/*.md` — invoked with `/<name>` |
+| Claude Code slash commands | Codex skills under `skills/<name>/SKILL.md`, invoked with `$<name>` or natural language (Codex does not expose `~/.codex/prompts/` as user slash commands) |
 | `${CLAUDE_PLUGIN_ROOT}` | `${STATSCLAW_CODEX_ROOT}` |
 | `${CLAUDE_PLUGIN_DATA}` | `${STATSCLAW_CODEX_DATA}` (default `~/.codex/data/statsclaw/`) |
 
@@ -62,45 +62,69 @@ Everything else — gates, preconditions, state transitions, must-not rules, the
 curl -fsSL https://raw.githubusercontent.com/statsclaw/statsclaw-codex/main/install-remote.sh | bash
 ```
 
-That's it. Open a **new** terminal and run `codex`. No manual `source`, no env-var juggling.
+Then:
 
-What it does, end to end:
+```bash
+codex                  # open a NEW terminal first so the env loads
+/plugins               # inside Codex: browse the marketplace
+install statsclaw      # install the plugin
+```
+
+That's it. From now on, every Codex session has StatsClaw available. Trigger any workflow with a `$skill-name` mention or natural language:
+
+```
+$patrol xuyiqing/fect
+$simulate finite-sample properties of this estimator
+$ship-it
+$review
+$contribute
+$brain on
+$loop 30m $patrol fect
+```
+
+Natural language also works — Codex matches each skill's `description`, so `"patrol open issues on xuyiqing/fect"` auto-triggers `$patrol`.
+
+### What the one-liner does, end to end
 
 1. Clones `statsclaw/statsclaw-codex` into `~/.codex/plugins/statsclaw` (or pulls if already there).
 2. Runs `install.sh` which:
    - Writes `STATSCLAW_CODEX_ROOT` / `STATSCLAW_CODEX_DATA` / `PATH` into `~/.codex/env.sh`.
    - Imports the protocol into `~/.codex/AGENTS.md` (so every Codex session inherits it).
-   - Symlinks `prompts/*.md` into `~/.codex/prompts/` — `/contribute`, `/loop`, `/ship-it`, `/review`, `/patrol`, `/simulate`, `/brain` are now slash commands.
    - Merges `[profiles.statsclaw-*]` blocks into `~/.codex/config.toml`, preserving your existing settings.
+   - Registers a user-scoped Codex marketplace at `~/.agents/plugins/marketplace.json` that points at this checkout as a local plugin source. `/plugins` inside Codex will list StatsClaw there.
    - Hooks `source ~/.codex/env.sh` into `~/.bashrc` and/or `~/.zshrc`, so new terminals auto-load the env.
    - Creates the runtime data dir `~/.codex/data/statsclaw/`.
 
 The installer and its hook are **idempotent** — re-running never duplicates lines.
 
-If you'd rather not pipe curl to bash (valid preference), do it in two steps:
+### Two-step install (if you don't like `curl | bash`)
 
 ```bash
 git clone https://github.com/statsclaw/statsclaw-codex ~/.codex/plugins/statsclaw
 bash ~/.codex/plugins/statsclaw/install.sh
 ```
 
-To skip the shell-rc hook and manage `source ~/.codex/env.sh` yourself:
+### Skip the shell-rc hook
 
 ```bash
 bash ~/.codex/plugins/statsclaw/install.sh --no-shell-hook
 # or for the remote installer:
-STATSCLAW_NO_SHELL_HOOK=1 curl -fsSL .../install-remote.sh | bash
+STATSCLAW_NO_SHELL_HOOK=1 curl -fsSL https://raw.githubusercontent.com/statsclaw/statsclaw-codex/main/install-remote.sh | bash
 ```
 
-### Try it
+### User-facing skills (`$skill-name`)
 
-```bash
-codex                    # start a session — AGENTS.md is auto-loaded
-/patrol fect on cfe      # run issue patrol
-/simulate finite-sample properties of the new estimator
-/ship-it                 # push reviewed changes
-/contribute              # submit session lessons to the shared brain
-```
+| Skill | Purpose |
+| --- | --- |
+| `$patrol` | Scan + auto-fix open GitHub issues on a target repo (workflow 4) |
+| `$simulate` | Monte Carlo simulation study for finite-sample properties (workflow 11/12) |
+| `$ship-it` | Review + commit + push + open PR (workflow 7) |
+| `$review` | Convergence check; issues a ship/no-ship verdict (workflow 8) |
+| `$contribute` | Extract session knowledge and (with consent) PR it to `statsclaw/brain-seedbank` |
+| `$brain` | Turn brain mode on/off or print status |
+| `$loop` | Run any of the above on a recurring interval |
+
+All other skills in `skills/` are internal protocol files — they are loaded by the leader but cannot be triggered by user input (their descriptions are prefixed `[Internal protocol — leader-only …]`).
 
 ### Per-project install
 

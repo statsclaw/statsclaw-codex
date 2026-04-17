@@ -1,8 +1,6 @@
 ---
 name: statsclaw-protocol
-description: "Core orchestration protocol for StatsClaw agent teams framework"
-user-invocable: false
-disable-model-invocation: true
+description: "[Internal protocol — leader-only. Not a user-invocable skill; do NOT trigger from user input.] Core orchestration protocol for the StatsClaw 9-agent framework. Defines every gate, state transition, precondition, must-not rule, workflow catalog, and signal-handling policy that the leader enforces."
 ---
 
 # StatsClaw-Codex — Agent Teams Framework for OpenAI Codex CLI
