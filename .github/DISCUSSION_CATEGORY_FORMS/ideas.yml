@@ -5,18 +5,19 @@ body:
   - type: markdown
     attributes:
       value: |
-        Share your ideas for StatsClaw-Codex! This is the place to brainstorm features,
+        Share your ideas for StatsClaw! This is the place to brainstorm features,
         discuss use cases, and help shape the roadmap.
 
         All ideas are welcome — from small improvements to ambitious new capabilities.
-        If your idea applies equally to the upstream Claude Code version
-        (`statsclaw/statsclaw`), feel free to post there instead (or cross-post).
+        Discussions are shared across both runtime distributions
+        (`statsclaw/statsclaw` for Claude Code and `statsclaw/statsclaw-codex` for Codex CLI),
+        so a single thread reaches users of both.
 
   - type: textarea
     id: idea
     attributes:
       label: Your idea
-      description: What would you like to see in StatsClaw-Codex?
+      description: What would you like to see in StatsClaw?
     validations:
       required: true
 
