@@ -134,6 +134,7 @@ Write your artifact to ${RUN_DIR}/<role-artifact>.md per your agent definition.
 - Only modify files within your assigned write surface.
 - Do NOT modify status.md — leader will update it.
 - Append to mailbox.md if you encounter blockers or interface changes.
+- Never write expected or target values, true parameter values, tolerances, errors against the target (bias, absolute or relative), or test inputs into mailbox.md, whatever file they come from — every teammate reads it, builder and simulator included.
 $(if [[ $USE_WORKTREE -eq 1 ]]; then
 cat <<EOF2
 - **WORKTREE ISOLATION**: You are running inside a git worktree at ${WORKTREE_PATH}.
